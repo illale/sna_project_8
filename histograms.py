@@ -9,7 +9,7 @@ topics = df["all_topics"].to_list()
 
 all_topics = []
 for topic in topics:
-    for sub in topic.split(", "):
+    for sub in topic.split(";"):
         all_topics.append(sub)
 
 
