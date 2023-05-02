@@ -27,7 +27,7 @@ while len(results) < 1000:
     results.append(
       {"title": result.title,
       "date": result.published,
-      "article_id": result.entry_id.split("/")[-1],
+      "article_id": result.entry_id.split('/abs/')[-1],
       "url": result.entry_id,
       "main_topic": result.primary_category,
       "all_topics": ";".join(result.categories),
