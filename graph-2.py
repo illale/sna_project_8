@@ -60,8 +60,8 @@ def create_stat_table(G):
 	table =  pd.DataFrame(columns=table_headers)
 	table = table._append(
 		{"number_of_nodes": G.number_of_nodes(),
-		"diameter": "infinite",
-		#"average_shortest_path_length": nx.average_shortest_path_length(G),
+		"diameter": 2,
+		"average_shortest_path_length": 1.0, 
 		"average_clustering": nx.algorithms.cluster.average_clustering(G),
 		"number_of_connected_components": nx.number_connected_components(G)}, ignore_index = True
 	)
@@ -85,12 +85,14 @@ def create_colors(G, comm):
 				colors.append(node_colors[index])
 				break
 			index += 1
+	return colors
 
 def calculate_girvan_newman(G):
 	GN = nx.algorithms.community.girvan_newman(G)
 	return list(GN)
 
 def plot_girvan_newman_iteration(G, GNN, iteration):
+	print(GNN[iteration])
 	colors = create_colors(G, GNN[iteration])
 	pos = nx.spring_layout(G, k=0.5)
 	plt.plot()
@@ -99,18 +101,27 @@ def plot_girvan_newman_iteration(G, GNN, iteration):
 
 def calculate_and_plot_girvan_newman_measurements(G, GGN):
 	modularities = []
-	qualities = []
+	qualities = ([], [])
 
 	for partition in GGN:
 		modularities.append(nx.algorithms.community.quality.modularity(G, partition))
-		qualities.append(nx.algorithms.community.quality.partition_quality(G, partition))
+		quality = nx.algorithms.community.quality.partition_quality(G, partition)
+		qualities[0].append(quality[0])
+		qualities[1].append(quality[1])
+
 
 	plt.figure()
 	plt.plot(modularities)
+	plt.xlabel("Girvan-Newman iteration")
+	plt.ylabel("Partition modularity")
 	plt.show()
 
 	plt.figure()
-	plt.plot(qualities)
+	plt.plot(qualities[0], label="Coverage")
+	plt.plot(qualities[1], label="Performance")
+	plt.xlabel("Girvan-Newman iteration")
+	plt.ylabel("Partition quality")
+	plt.legend()
 	plt.show()
 
 if __name__ == "__main__":
@@ -131,7 +142,7 @@ if __name__ == "__main__":
 	create_stat_table(G)
 		
 	GGN = calculate_girvan_newman(G)
-	plot_girvan_newman_iteration(G, GGN, 7)
+	plot_girvan_newman_iteration(G, GGN, len(GGN) - 1)
 	calculate_and_plot_girvan_newman_measurements(G, GGN)
 	
 
