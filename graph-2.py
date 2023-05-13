@@ -7,6 +7,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib
 
+singular_nodes = []
+
 def get_collaborators():
 	base_url = "http://export.arxiv.org/api/query?"
 
@@ -43,6 +45,9 @@ def get_collaborators():
 							collabs.append([*combination, 1])
 						else:
 							collabs.index(combination)[2] += 1
+				#else:
+				#	singular_nodes.append(*affiliations)
+
 			except:
 				pass
 
@@ -60,7 +65,7 @@ def create_stat_table(G):
 	table =  pd.DataFrame(columns=table_headers)
 	table = table._append(
 		{"number_of_nodes": G.number_of_nodes(),
-		"diameter": 2,
+		"diameter": 1,
 		"average_shortest_path_length": 1.0, 
 		"average_clustering": nx.algorithms.cluster.average_clustering(G),
 		"number_of_connected_components": nx.number_connected_components(G)}, ignore_index = True
@@ -131,6 +136,7 @@ if __name__ == "__main__":
 
 	G = nx.Graph()
 	G.add_weighted_edges_from(collabs)
+	G.add_nodes_from(singular_nodes)
 	
 	plt.plot()
 	pos = nx.spring_layout(G, k=0.5)
@@ -142,7 +148,7 @@ if __name__ == "__main__":
 	create_stat_table(G)
 		
 	GGN = calculate_girvan_newman(G)
-	plot_girvan_newman_iteration(G, GGN, len(GGN) - 1)
+	plot_girvan_newman_iteration(G, GGN, 0)
 	calculate_and_plot_girvan_newman_measurements(G, GGN)
 	
 
