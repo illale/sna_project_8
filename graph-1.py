@@ -79,9 +79,9 @@ def create_adjacency_and_stat_table(G):
     table =  pd.DataFrame(columns=table_headers)
     table = table.append(
         {"number_of_nodes": G.number_of_nodes(),
-        "diameter": nx.distance_measures.diameter(G),
-        "average_shortest_path_length": nx.average_shortest_path_length(G),
-        "average_clustering": nx.algorithms.cluster.average_clustering(G),
+        "diameter": nx.distance_measures.diameter(G, weight='weight'),
+        "average_shortest_path_length": nx.average_shortest_path_length(G, weight='weight'),
+        "average_clustering": nx.algorithms.cluster.average_clustering(G, weight='weight'),
         "number_of_connected_components": nx.number_connected_components(G)}, ignore_index = True
     )
 
@@ -109,10 +109,14 @@ def calculate_and_plot_girvan_newman_measurements(G, GGN):
 
     plt.figure()
     plt.plot(modularities)
+    plt.ylabel("Modularity")
+    plt.xlabel("Iteration")
     plt.show()
 
     plt.figure()
     plt.plot(qualities)
+    plt.legend(("Coverage", "Performance"))
+    plt.xlabel("Iteration")
     plt.show()
 
 if __name__ == "__main__":
@@ -120,6 +124,7 @@ if __name__ == "__main__":
     G = create_graph(df)
     pos = nx.drawing.layout.circular_layout(G)
     plot_network(G, pos)
+    print(nx.get_edge_attributes(G,'weight'))
 
     #Remove unconnected nodes.
     G.remove_nodes_from(list(nx.isolates(G)))
@@ -129,5 +134,5 @@ if __name__ == "__main__":
 
     create_adjacency_and_stat_table(G)
     GGN = calculate_girvan_newman(G)
-    plot_girvan_newman_iteration(G, GGN, 10)
+    plot_girvan_newman_iteration(G, GGN, 9)
     calculate_and_plot_girvan_newman_measurements(G, GGN)
